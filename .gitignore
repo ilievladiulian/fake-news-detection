@@ -1,0 +1,9 @@
+**/__pycache__/
+
+dataset/news_cleaned.csv
+
+.linear_vector_cache/
+
+.vector_cache/
+
+.vscode/
