@@ -17,11 +17,17 @@ There is a tool in /dataset/save_dataset.py used to extract examples from /datas
 
 ### Usage
 
-To run the training on the rcnn:
+To see the help for this program run
 
-    python main.py
+    python main.py -h
 
 To run the training on the logistic regression model:
 
-    python linear_regression.py
+    python main.py -m logreg
+
+To run the training on the rcnn model:
+
+    python main.py -m rcnn
+
+The program also accepts long-options: --help, --model=  
     
