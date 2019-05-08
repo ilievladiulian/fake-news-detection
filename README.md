@@ -29,5 +29,9 @@ To run the training on the rcnn model:
 
     python main.py -m rcnn
 
+To run the training on the rnn model:
+
+    python main.py -m rnn
+
 The program also accepts long-options: --help, --model=  
     

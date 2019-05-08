@@ -2,10 +2,10 @@ import torch
 import torch.nn.functional as F
 import torch.optim as optim
 import dataset.load_dataset as load_dataset
-from model.rcnn_model import RCNN
+from model.rnn_model import RNN
 from training_handler import TrainingHandler
 
-class RecurrentConvolutionalNN():
+class RecurrentNN():
     def __init__(self):
         datasetType = 'generic'
         TEXT, vocab_size, word_embeddings, self.train_iter, self.valid_iter, self.test_iter = load_dataset.load(datasetType=datasetType)
@@ -15,7 +15,7 @@ class RecurrentConvolutionalNN():
         hidden_size = 256
         embedding_length = 300
 
-        self.model = RCNN(batch_size, output_size, hidden_size, vocab_size, embedding_length, word_embeddings)
+        self.model = RNN(batch_size, output_size, hidden_size, vocab_size, embedding_length, word_embeddings)
 
         optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, self.model.parameters()))
         loss_fn = F.cross_entropy
