@@ -2,6 +2,8 @@ import sys, getopt
 from logistic_regression import LogisticRegression
 from recurrent_cnn import RecurrentConvolutionalNN
 from rnn import RecurrentNN
+from cnn import ConvolutionalNN
+from lstm import LongShortTermMemory
 
 
 def main(argv):
@@ -9,17 +11,19 @@ def main(argv):
     modelPossibilities = {
         'logreg': LogisticRegression,
         'rcnn': RecurrentConvolutionalNN,
-        'rnn': RecurrentNN
+        'rnn': RecurrentNN,
+        'cnn': ConvolutionalNN,
+        'lstm': LongShortTermMemory
     }
 
     try:
         opts, args = getopt.getopt(argv, 'hm:', ['help' ,'model='])
     except getopt.GetoptError:
-        print('usage: main.py -m <modelname> or main.py --model=<modelname>, where <modelname>: rnn, rcnn or logreg')
+        print('usage: main.py -m <modelname> or main.py --model=<modelname>, where <modelname>: rnn, lstm, cnn, rcnn or logreg')
         sys.exit(2)
     for opt, arg in opts:
         if opt in ('-h', '--help'):
-            print('usage: main.py -m <modelname> or main.py --model=<modelname>, where <modelname>: rnn, rcnn or logreg')
+            print('usage: main.py -m <modelname> or main.py --model=<modelname>, where <modelname>: rnn, lstm, cnn, rcnn or logreg')
             sys.exit()
         elif opt in ('-m', '--model'):
             modelName = arg
