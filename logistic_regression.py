@@ -27,6 +27,6 @@ class LogisticRegression():
             print(f'Epoch: {epoch+1:02}, Train Loss: {train_loss:.3f}, Train Acc: {train_acc:.2f}%, Val. Loss: {val_loss:3f}, Val. Acc: {val_acc:.2f}%')
 
     def test(self):
-        test_loss, test_acc = training_handler.eval_model(self.model, self.test_iter)
+        test_loss, test_acc = self.training_handler.eval_model(self.model, self.test_iter)
         return test_loss, test_acc
 
