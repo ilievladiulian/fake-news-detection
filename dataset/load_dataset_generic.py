@@ -21,7 +21,7 @@ def load():
         examples.append(example)
     dataset = data.Dataset(examples, [('content', TEXT), ('label', LABEL)])
 
-    train_data, test_data = dataset.split()
+    train_data, test_data = dataset.split(stratified=True)
     TEXT.build_vocab(train_data, vectors=GloVe(name='6B', dim=300))
     LABEL.build_vocab(train_data)
 
