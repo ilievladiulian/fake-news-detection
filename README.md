@@ -25,7 +25,9 @@ python ./dataset/save_dataset.py
 
 To see the help for this program run
 
-    python main.py -h
+```
+python main.py -h
+```
 
 To run the training on the logistic regression model:
 
