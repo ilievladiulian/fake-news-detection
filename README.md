@@ -16,7 +16,9 @@ There is a tool in /dataset/save_dataset.py used to extract examples from /datas
 
 To save the dataset to mongo run:
 
-    python ./dataset/save_dataset.py
+```
+python ./dataset/save_dataset.py
+```
 
 
 ### Usage
