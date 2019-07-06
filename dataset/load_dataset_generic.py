@@ -30,7 +30,7 @@ def load():
     print ("Vector size of Text Vocabulary: ", TEXT.vocab.vectors.size())
     print ("Label Length: " + str(len(LABEL.vocab)))
 
-    train_data, valid_data = train_data.split() # Further splitting of training_data to create new training_data & validation_data
+    train_data, valid_data = train_data.split(stratified=True) # Further splitting of training_data to create new training_data & validation_data
     train_iter, valid_iter, test_iter = data.BucketIterator.splits((train_data, valid_data, test_data), batch_size=4, sort_key=lambda x: len(x.content), repeat=False, shuffle=True)
 
     vocab_size = len(TEXT.vocab)
