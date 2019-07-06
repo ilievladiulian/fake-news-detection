@@ -14,6 +14,10 @@ This project uses the following dependencies:
 
 There is a tool in /dataset/save_dataset.py used to extract examples from /dataset/news_cleaned.csv and save them to MongoDB. To check this feature, you need to manually add the file news_cleaned.csv in the /dataset directory.
 
+To save the dataset to mongo run:
+
+    python ./dataset/save_dataset.py
+
 
 ### Usage
 
