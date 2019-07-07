@@ -37,7 +37,7 @@ def load():
         examples.append(example)
     dataset = data.Dataset(examples, [('content', TEXT), ('label', LABEL)])
 
-    train_data, test_data = dataset.split(stratified=True)
+    train_data, test_data = dataset.split(stratified=True, split_ratio=0.9)
     TEXT.build_vocab(dataset, vectors=GloVe(name='6B', dim=300, cache='./.linear_vector_cache'))
     LABEL.build_vocab(dataset)
 
@@ -46,7 +46,7 @@ def load():
     print ("Vector size of Text Vocabulary: ", TEXT.vocab.vectors.size())
     print ("Label Length: " + str(len(LABEL.vocab)))
 
-    train_data, valid_data = train_data.split(stratified=True) # Further splitting of training_data to create new training_data & validation_data
+    train_data, valid_data = train_data.split(stratified=True, split_ratio=0.9) # Further splitting of training_data to create new training_data & validation_data
     train_iter, valid_iter, test_iter = data.BucketIterator.splits((train_data, valid_data, test_data), batch_size=4, sort_key=lambda x: len(x.content), repeat=False, shuffle=True)
 
     vocab_size = len(TEXT.vocab)

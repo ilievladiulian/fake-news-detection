@@ -33,11 +33,21 @@ def main(argv):
         print('Invalid model name. Type python main.py -h for help')
         sys.exit()
 
-    modelHandler = modelHandlerName()
-    modelHandler.train()
+    results = []
+    for i in range(10):
+        modelHandler = modelHandlerName()
+        modelHandler.train()
 
-    test_loss, test_acc = modelHandler.test()
-    print(f'Test Loss: {test_loss:.3f}, Test Acc: {test_acc:.2f}%')
+        test_loss, test_acc = modelHandler.test()
+        print(f'Test Loss: {test_loss:.3f}, Test Acc: {test_acc:.2f}%')
+
+        results.append({
+            'test-loss': test_loss,
+            'test-acc': test_acc,
+            'iteration': i
+        })
+
+    print(results)
 
     
 

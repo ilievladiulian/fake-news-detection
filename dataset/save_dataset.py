@@ -2,7 +2,7 @@ import csv
 from database_connection import collection
 from news_model import NewsObject
 
-MAX_LINE_COUNT = 2000
+MAX_LINE_COUNT = 10000
 data_tags = {
     'fake': 0, 
     'satire': 0, 
