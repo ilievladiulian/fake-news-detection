@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.optim as optim
 import dataset.load_dataset as load_dataset
 from training_handler import TrainingHandler
-from main import outputFileHandler
+import output_handler
 from model.logistic_regression_model import LogisticRegressionModel
 
 class LogisticRegression():
@@ -26,7 +26,7 @@ class LogisticRegression():
             train_loss, train_acc = self.training_handler.train_model(self.model, self.train_iter, epoch)
             val_loss, val_acc = self.training_handler.eval_model(self.model, self.valid_iter)
             print(f'Epoch: {epoch+1:02}, Train Loss: {train_loss:.3f}, Train Acc: {train_acc:.2f}%, Val. Loss: {val_loss:3f}, Val. Acc: {val_acc:.2f}%')
-            outputFileHandler.write(f'Epoch: {epoch+1:02}, Train Loss: {train_loss:.3f}, Train Acc: {train_acc:.2f}%, Val. Loss: {val_loss:3f}, Val. Acc: {val_acc:.2f}%')
+            output_handler.outputFileHandler.write(f'Epoch: {epoch+1:02}, Train Loss: {train_loss:.3f}, Train Acc: {train_acc:.2f}%, Val. Loss: {val_loss:3f}, Val. Acc: {val_acc:.2f}%')
 
     def test(self):
         test_loss, test_acc = self.training_handler.eval_model(self.model, self.test_iter)

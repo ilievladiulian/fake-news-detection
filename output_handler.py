@@ -1,6 +1,8 @@
+outputFileHandler = None
+
 class OutputHandler():
     def __init__(self, filename):
-        self.fileDescriptor = open(outputFile, "a+")
+        self.fileDescriptor = open(filename, "a+")
 
     def write(self, message):
         self.fileDescriptor.write(message)

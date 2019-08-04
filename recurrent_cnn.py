@@ -3,7 +3,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 import dataset.load_dataset as load_dataset
 from model.rcnn_model import RCNN
-from main import outputFileHandler
+import output_handler
 from training_handler import TrainingHandler
 
 class RecurrentConvolutionalNN():
@@ -28,7 +28,7 @@ class RecurrentConvolutionalNN():
             train_loss, train_acc = self.training_handler.train_model(self.model, self.train_iter, epoch)
             val_loss, val_acc = self.training_handler.eval_model(self.model, self.valid_iter)
             print(f'Epoch: {epoch+1:02}, Train Loss: {train_loss:.3f}, Train Acc: {train_acc:.2f}%, Val. Loss: {val_loss:3f}, Val. Acc: {val_acc:.2f}%')
-            outputFileHandler.write(f'Epoch: {epoch+1:02}, Train Loss: {train_loss:.3f}, Train Acc: {train_acc:.2f}%, Val. Loss: {val_loss:3f}, Val. Acc: {val_acc:.2f}%\n')
+            output_handler.outputFileHandler.write(f'Epoch: {epoch+1:02}, Train Loss: {train_loss:.3f}, Train Acc: {train_acc:.2f}%, Val. Loss: {val_loss:3f}, Val. Acc: {val_acc:.2f}%\n')
 
     def test(self):
         test_loss, test_acc = self.training_handler.eval_model(self.model, self.test_iter)

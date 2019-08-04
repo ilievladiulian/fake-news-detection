@@ -4,10 +4,11 @@ from recurrent_cnn import RecurrentConvolutionalNN
 from rnn import RecurrentNN
 from cnn import ConvolutionalNN
 from lstm import LongShortTermMemory
-from output_handler import OutputHandler
+import output_handler
 import torch
 
-outputFileHandler = None
+def init(filename):
+    output_handler.outputFileHandler = output_handler.OutputHandler(filename)
 
 def main(argv):
     modelName = ''
@@ -22,7 +23,8 @@ def main(argv):
     classifierType = None
     classifierTypePossibilities = {
         'longer': 'longer',
-        'repeater': 'repeater'
+        'repeater': 'repeater',
+        'normal': 'normal'
     }
 
     try:
@@ -46,8 +48,8 @@ def main(argv):
         print('Invalid model name. Type python main.py -h for help')
         sys.exit()
     
-    outputFileHandler = OutputHandler(outputFile)
-    outputFileHandler.write("Start log \n")
+    init(outputFile)
+    output_handler.outputFileHandler.write("Start log \n")
 
     numberOfEpochs = 10
 
