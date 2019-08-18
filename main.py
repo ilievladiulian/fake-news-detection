@@ -26,9 +26,15 @@ def main(argv):
         'repeater': 'repeater',
         'normal': 'normal'
     }
+    embedding = None
+    embeddingPossibilities = {
+        'ft': 'fasttext',
+        'glv': 'glove',
+        'w2v': 'word2vec'
+    }
 
     try:
-        opts, args = getopt.getopt(argv, 'hmot:', ['help', 'model=', 'output=', 'type='])
+        opts, args = getopt.getopt(argv, 'hmote:', ['help', 'model=', 'output=', 'type=', 'embedding='])
     except getopt.GetoptError:
         print('usage: main.py -m <modelname> or main.py --model=<modelname>, where <modelname>: rnn, lstm, cnn, rcnn or logreg')
         sys.exit(2)
@@ -42,6 +48,8 @@ def main(argv):
             outputFile = arg
         elif opt in ('-t', '--type'):
             classifierType = arg
+        elif opt in ('-e', '--embedding'):
+            embedding = arg
     
     modelHandlerName = modelPossibilities.get(modelName, 'Invalid model')
     if modelHandlerName == 'Invalid model':
@@ -55,21 +63,29 @@ def main(argv):
 
     if classifierType == classifierTypePossibilities['longer']:
         numberOfEpochs = 20
-        modelHandler = modelHandlerName()
+        modelHandler = modelHandlerName(embeddingPossibilities[embedding])
         modelHandler.train(numberOfEpochs)
         test_loss, test_acc = modelHandler.test()
         print(f'Test Loss: {test_loss:.3f}, Test Acc: {test_acc:.2f}%')
-        outputFileHandler.write(f'Test Loss: {test_loss:.3f}, Test Acc: {test_acc:.2f}%\n')
-    else:
+        output_handler.outputFileHandler.write(f'Test Loss: {test_loss:.3f}, Test Acc: {test_acc:.2f}%\n')
+    elif classifierType == classifierTypePossibilities['repeater']:
         results = []
         modelHandler = None
         torch.cuda.empty_cache()
         for i in range(numberOfEpochs):
-            modelHandler = modelHandlerName()
+            torch.cuda.empty_cache()
+            modelHandler = modelHandlerName(embeddingPossibilities[embedding])
             modelHandler.train(numberOfEpochs)
             test_loss, test_acc = modelHandler.test()
             print(f'Test Loss: {test_loss:.3f}, Test Acc: {test_acc:.2f}%')
-            outputFileHandler.write(f'Test Loss: {test_loss:.3f}, Test Acc: {test_acc:.2f}%\n')
+            output_handler.outputFileHandler.write(f'Test Loss: {test_loss:.3f}, Test Acc: {test_acc:.2f}%\n')
+    else:
+        modelHandler = modelHandlerName(embeddingPossibilities[embedding])
+        modelHandler.train(numberOfEpochs)
+        test_loss, test_acc = modelHandler.test()
+        print(f'Test Loss: {test_loss:.3f}, Test Acc: {test_acc:.2f}%')
+        output_handler.outputFileHandler.write(f'Test Loss: {test_loss:.3f}, Test Acc: {test_acc:.2f}%\n')
+
 
     outputFileHandler.close()
 

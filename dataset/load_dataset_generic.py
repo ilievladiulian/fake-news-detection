@@ -1,9 +1,10 @@
 from .database_connection import collection
 from .news_model import NewsObject
 import torch
+import gensim.models.keyedvectors as word2vec
 import re
 from torchtext import data
-from torchtext.vocab import Vectors, GloVe
+from torchtext.vocab import Vectors, GloVe, FastText
 
 def extract_words(sentence):
     ignore = ['a', "the", "is"]
@@ -11,7 +12,7 @@ def extract_words(sentence):
     cleaned_text = [w.lower() for w in words if w not in ignore]
     return cleaned_text
 
-def load():
+def load(embedding):
     TEXT = data.Field(sequential=True, tokenize=extract_words, lower=True, include_lengths=True, batch_first=True)
     LABEL = data.LabelField(dtype=torch.float)
 
@@ -22,7 +23,18 @@ def load():
     dataset = data.Dataset(examples, [('content', TEXT), ('label', LABEL)])
 
     train_data, test_data = dataset.split(stratified=True, split_ratio=0.8)
-    TEXT.build_vocab(train_data, vectors=GloVe(name='6B', dim=300))
+
+    if embedding == 'glove':
+        TEXT.build_vocab(train_data, vectors=GloVe(name='6B', dim=300))
+    elif embedding == 'fasttext':
+        TEXT.build_vocab(train_data, vectors=FastText(language='en'))
+    elif embedding == 'word2vec':
+        w2vmodel = word2vec.KeyedVectors.load_word2vec_format('.word2vec_cache/GoogleNews-vectors-negative300.bin', binary=True, limit=1000000)
+        w2vmodel.wv.save_word2vec_format('.word2vec_cache/embeddings.vec')
+        w2vmodel = None
+        word2vectors = Vectors(name='embeddings.vec', cache='.word2vec_cache')
+        TEXT.build_vocab(train_data, vectors=word2vectors)
+
     LABEL.build_vocab(train_data)
 
     word_embeddings = TEXT.vocab.vectors

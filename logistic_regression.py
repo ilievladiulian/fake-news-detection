@@ -7,9 +7,9 @@ import output_handler
 from model.logistic_regression_model import LogisticRegressionModel
 
 class LogisticRegression():
-    def __init__(self):
+    def __init__(self, embedding):
         datasetType = 'linear'
-        TEXT, vocab_size, word_embeddings, self.train_iter, self.valid_iter, self.test_iter = load_dataset.load(datasetType=datasetType)
+        TEXT, vocab_size, word_embeddings, self.train_iter, self.valid_iter, self.test_iter = load_dataset.load(datasetType=datasetType, embedding=embedding)
 
         output_size = 13
         learning_rate = 2e-5

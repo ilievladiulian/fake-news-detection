@@ -4,6 +4,8 @@ dataset/news_cleaned.csv
 
 .linear_vector_cache/
 
+.word2vec_cache/
+
 .vector_cache/
 
 .vscode/

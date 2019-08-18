@@ -7,9 +7,9 @@ import output_handler
 from training_handler import TrainingHandler
 
 class LongShortTermMemory():
-    def __init__(self):
+    def __init__(self, embedding):
         datasetType = 'generic'
-        TEXT, vocab_size, word_embeddings, self.train_iter, self.valid_iter, self.test_iter = load_dataset.load(datasetType=datasetType)
+        TEXT, vocab_size, word_embeddings, self.train_iter, self.valid_iter, self.test_iter = load_dataset.load(datasetType=datasetType, embedding=embedding)
 
         batch_size = 4
         output_size = 13

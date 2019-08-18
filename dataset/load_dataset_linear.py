@@ -38,7 +38,14 @@ def load():
     dataset = data.Dataset(examples, [('content', TEXT), ('label', LABEL)])
 
     train_data, test_data = dataset.split(stratified=True, split_ratio=0.8)
-    TEXT.build_vocab(dataset, vectors=GloVe(name='6B', dim=300, cache='./.linear_vector_cache'))
+
+    if embedding == 'glove':
+        TEXT.build_vocab(train_data, vectors=GloVe(name='6B', dim=300, cache='./.linear_vector_cache'))
+    elif embedding == 'fasttext':
+        TEXT.build_vocab(train_data, vectors=FastText(language='en'))
+    elif embedding == 'word2vec':
+        word2vectors = Vectors('.word2vec_cache/GoogleNews-vectors-negative300.bin', cache='.word2vec_cache')
+        TEXT.build_vocab(train_data, vectors=word2vectors)
     LABEL.build_vocab(dataset)
 
     word_embeddings = TEXT.vocab.vectors
