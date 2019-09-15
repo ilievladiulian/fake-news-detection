@@ -1,5 +1,6 @@
 import torch
 from torch.autograd import Variable
+from metrics import metrics_handler
 
 class TrainingHandler():
     def __init__(self, optimizer, loss_fn):
@@ -48,6 +49,7 @@ class TrainingHandler():
         total_epoch_loss = 0
         total_epoch_acc = 0
         model.eval()
+        model.cuda()
         with torch.no_grad():
             for idx, batch in enumerate(val_iter):
                 text = batch.content[0]
@@ -60,6 +62,9 @@ class TrainingHandler():
                     target = target.cuda()
                 prediction = model(text)
                 loss = self.loss_fn(prediction, target)
+                predictedLabel = torch.max(prediction, 1)[1].view(target.size()).data
+                for i in range(list(predictedLabel.size())[0]):
+                    metrics_handler.metricsHandler.update((predictedLabel.data)[i].item(), (target.data)[i].item())
                 num_corrects = (torch.max(prediction, 1)[1].view(target.size()).data == target.data).sum()
                 acc = 100.0 * num_corrects/len(batch)
                 total_epoch_loss += loss.item()

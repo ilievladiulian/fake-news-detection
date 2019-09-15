@@ -29,9 +29,9 @@ def load(embedding):
     elif embedding == 'fasttext':
         TEXT.build_vocab(train_data, vectors=FastText(language='en'))
     elif embedding == 'word2vec':
-        w2vmodel = word2vec.KeyedVectors.load_word2vec_format('.word2vec_cache/GoogleNews-vectors-negative300.bin', binary=True, limit=1000000)
-        w2vmodel.wv.save_word2vec_format('.word2vec_cache/embeddings.vec')
-        w2vmodel = None
+        # w2vmodel = word2vec.KeyedVectors.load_word2vec_format('.word2vec_cache/GoogleNews-vectors-negative300.bin', binary=True, limit=1000000)
+        # w2vmodel.wv.save_word2vec_format('.word2vec_cache/embeddings.vec')
+        # w2vmodel = None
         word2vectors = Vectors(name='embeddings.vec', cache='.word2vec_cache')
         TEXT.build_vocab(train_data, vectors=word2vectors)
 

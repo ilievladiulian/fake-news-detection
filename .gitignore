@@ -9,3 +9,5 @@ dataset/news_cleaned.csv
 .vector_cache/
 
 .vscode/
+
+run.sh

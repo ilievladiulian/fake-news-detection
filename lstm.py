@@ -12,7 +12,7 @@ class LongShortTermMemory():
         TEXT, vocab_size, word_embeddings, self.train_iter, self.valid_iter, self.test_iter = load_dataset.load(datasetType=datasetType, embedding=embedding)
 
         batch_size = 4
-        output_size = 13
+        output_size = 10
         hidden_size = 256
         embedding_length = 300
 

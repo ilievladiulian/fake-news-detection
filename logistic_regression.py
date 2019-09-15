@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import torch.optim as optim
 import dataset.load_dataset as load_dataset
 from training_handler import TrainingHandler
@@ -8,16 +9,16 @@ from model.logistic_regression_model import LogisticRegressionModel
 
 class LogisticRegression():
     def __init__(self, embedding):
-        datasetType = 'linear'
+        datasetType = 'generic'
         TEXT, vocab_size, word_embeddings, self.train_iter, self.valid_iter, self.test_iter = load_dataset.load(datasetType=datasetType, embedding=embedding)
 
-        output_size = 13
+        output_size = 10
         learning_rate = 2e-5
 
-        self.model = LogisticRegressionModel(vocab_size, output_size)
+        self.model = LogisticRegressionModel(output_size, vocab_size, 300, word_embeddings)
 
-        loss_fn = nn.CrossEntropyLoss()
-        optimizer = torch.optim.SGD(self.model.parameters(), lr = learning_rate, weight_decay=0.0005)
+        optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, self.model.parameters()), weight_decay=0.0005, lr=0.0001)
+        loss_fn = F.cross_entropy
         self.training_handler = TrainingHandler(optimizer, loss_fn)
 
     def train(self, numberOfEpochs):

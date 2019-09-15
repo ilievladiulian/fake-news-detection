@@ -4,11 +4,13 @@ from recurrent_cnn import RecurrentConvolutionalNN
 from rnn import RecurrentNN
 from cnn import ConvolutionalNN
 from lstm import LongShortTermMemory
+from metrics import metrics_handler
 import output_handler
 import torch
 
 def init(filename):
     output_handler.outputFileHandler = output_handler.OutputHandler(filename)
+    metrics_handler.metricsHandler = metrics_handler.MetricsHandler()
 
 def main(argv):
     modelName = ''
@@ -65,9 +67,13 @@ def main(argv):
         numberOfEpochs = 20
         modelHandler = modelHandlerName(embeddingPossibilities[embedding])
         modelHandler.train(numberOfEpochs)
+        metrics_handler.metricsHandler.reset()
         test_loss, test_acc = modelHandler.test()
         print(f'Test Loss: {test_loss:.3f}, Test Acc: {test_acc:.2f}%')
         output_handler.outputFileHandler.write(f'Test Loss: {test_loss:.3f}, Test Acc: {test_acc:.2f}%\n')
+
+        output_handler.outputFileHandler.write(f'Test recall: {metrics_handler.metricsHandler.getRecall():.3f}%\n')
+        output_handler.outputFileHandler.write(f'Test precision: {metrics_handler.metricsHandler.getPrecision():.3f}%\n')
     elif classifierType == classifierTypePossibilities['repeater']:
         results = []
         modelHandler = None
@@ -76,18 +82,25 @@ def main(argv):
             torch.cuda.empty_cache()
             modelHandler = modelHandlerName(embeddingPossibilities[embedding])
             modelHandler.train(numberOfEpochs)
+            metrics_handler.metricsHandler.reset()
             test_loss, test_acc = modelHandler.test()
             print(f'Test Loss: {test_loss:.3f}, Test Acc: {test_acc:.2f}%')
             output_handler.outputFileHandler.write(f'Test Loss: {test_loss:.3f}, Test Acc: {test_acc:.2f}%\n')
+
+            output_handler.outputFileHandler.write(f'Test recall: {metrics_handler.metricsHandler.getRecall():.3f}%\n')
+            output_handler.outputFileHandler.write(f'Test precision: {metrics_handler.metricsHandler.getPrecision():.3f}%\n')
     else:
         modelHandler = modelHandlerName(embeddingPossibilities[embedding])
         modelHandler.train(numberOfEpochs)
+        metrics_handler.metricsHandler.reset()
         test_loss, test_acc = modelHandler.test()
         print(f'Test Loss: {test_loss:.3f}, Test Acc: {test_acc:.2f}%')
         output_handler.outputFileHandler.write(f'Test Loss: {test_loss:.3f}, Test Acc: {test_acc:.2f}%\n')
 
+        output_handler.outputFileHandler.write(f'Test recall: {metrics_handler.metricsHandler.getRecall():.3f}%\n')
+        output_handler.outputFileHandler.write(f'Test precision: {metrics_handler.metricsHandler.getPrecision():.3f}%\n')
 
-    outputFileHandler.close()
+    output_handler.outputFileHandler.close()
 
 if __name__ == '__main__':
     main(sys.argv[1:])
