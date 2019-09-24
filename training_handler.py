@@ -15,7 +15,8 @@ class TrainingHandler():
     def train_model(self, model, train_iter, epoch):
         total_epoch_loss = 0
         total_epoch_acc = 0
-        model.cuda()
+        if torch.cuda.is_available():
+            model.cuda()
         steps = 0
         model.train()
         for idx, batch in enumerate(train_iter):
@@ -49,7 +50,8 @@ class TrainingHandler():
         total_epoch_loss = 0
         total_epoch_acc = 0
         model.eval()
-        model.cuda()
+        if torch.cuda.is_available():
+            model.cuda()
         with torch.no_grad():
             for idx, batch in enumerate(val_iter):
                 text = batch.content[0]

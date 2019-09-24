@@ -29,7 +29,8 @@ class ConvolutionalNN():
 
     def train(self, numberOfEpochs):
         for epoch in range(numberOfEpochs):
-            torch.cuda.empty_cache()
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
             train_loss, train_acc = self.training_handler.train_model(self.model, self.train_iter, epoch)
             val_loss, val_acc = self.training_handler.eval_model(self.model, self.valid_iter)
             print(f'Epoch: {epoch+1:02}, Train Loss: {train_loss:.3f}, Train Acc: {train_acc:.2f}%, Val. Loss: {val_loss:3f}, Val. Acc: {val_acc:.2f}%')
