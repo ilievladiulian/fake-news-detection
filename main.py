@@ -77,9 +77,11 @@ def main(argv):
     elif classifierType == classifierTypePossibilities['repeater']:
         results = []
         modelHandler = None
-        torch.cuda.empty_cache()
-        for i in range(numberOfEpochs):
+        if torch.cuda.is_available():
             torch.cuda.empty_cache()
+        for i in range(numberOfEpochs):
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
             modelHandler = modelHandlerName(embeddingPossibilities[embedding])
             modelHandler.train(numberOfEpochs)
             metrics_handler.metricsHandler.reset()
