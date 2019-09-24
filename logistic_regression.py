@@ -9,8 +9,7 @@ from model.logistic_regression_model import LogisticRegressionModel
 
 class LogisticRegression():
     def __init__(self, embedding):
-        datasetType = 'generic'
-        TEXT, vocab_size, word_embeddings, self.train_iter, self.valid_iter, self.test_iter = load_dataset.load(datasetType=datasetType, embedding=embedding)
+        TEXT, vocab_size, word_embeddings, self.train_iter, self.valid_iter, self.test_iter = load_dataset.load(embedding=embedding)
 
         output_size = 10
         learning_rate = 2e-5

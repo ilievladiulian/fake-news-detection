@@ -8,8 +8,7 @@ from training_handler import TrainingHandler
 
 class ConvolutionalNN():
     def __init__(self, embedding):
-        datasetType = 'generic'
-        TEXT, vocab_size, word_embeddings, self.train_iter, self.valid_iter, self.test_iter = load_dataset.load(datasetType=datasetType, embedding=embedding)
+        TEXT, vocab_size, word_embeddings, self.train_iter, self.valid_iter, self.test_iter = load_dataset.load(embedding=embedding)
 
         batch_size = 4
         output_size = 10
