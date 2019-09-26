@@ -8,6 +8,8 @@ dataset/news_cleaned.csv
 
 .vector_cache/
 
+.fasttext_cache/
+
 .vscode/
 
 run.sh

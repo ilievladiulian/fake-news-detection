@@ -4,7 +4,7 @@ import torch
 import gensim.models.keyedvectors as word2vec
 import re
 from torchtext import data
-from torchtext.vocab import Vectors, GloVe, FastText
+from torchtext.vocab import Vectors, GloVe
 
 def extract_words(sentence):
     ignore = ['a', "the", "is"]
@@ -27,7 +27,8 @@ def load(embedding):
     if embedding == 'glove':
         TEXT.build_vocab(train_data, vectors=GloVe(name='6B', dim=300))
     elif embedding == 'fasttext':
-        TEXT.build_vocab(train_data, vectors=FastText(language='en'))
+        fasttext_vectors = Vectors(name="crawl-300d-2M.vec", cache=".fasttext_cache")
+        TEXT.build_vocab(train_data, vectors=fasttext_vectors)
     elif embedding == 'word2vec':
         # w2vmodel = word2vec.KeyedVectors.load_word2vec_format('.word2vec_cache/GoogleNews-vectors-negative300.bin', binary=True, limit=1000000)
         # w2vmodel.wv.save_word2vec_format('.word2vec_cache/embeddings.vec')
