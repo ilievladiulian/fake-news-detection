@@ -4,6 +4,7 @@ from recurrent_cnn import RecurrentConvolutionalNN
 from rnn import RecurrentNN
 from cnn import ConvolutionalNN
 from lstm import LongShortTermMemory
+from lstm_attention import LongShortTermMemoryAttention
 from metrics import metrics_handler
 import output_handler
 import torch
@@ -19,7 +20,8 @@ def main(argv):
         'rcnn': RecurrentConvolutionalNN,
         'rnn': RecurrentNN,
         'cnn': ConvolutionalNN,
-        'lstm': LongShortTermMemory
+        'lstm': LongShortTermMemory,
+        'lstm-attn': LongShortTermMemoryAttention
     }
     outputFile = None
     classifierType = None
@@ -30,9 +32,12 @@ def main(argv):
     }
     embedding = None
     embeddingPossibilities = {
-        'ft': 'fasttext',
-        'glv': 'glove',
-        'w2v': 'word2vec'
+        'ft_generic': 'fasttext_generic',
+        'glv_generic': 'glove_generic',
+        'w2v_generic': 'word2vec_generic',
+        'ft_specific': 'fasttext_specific',
+        'glv_specific': 'glove_specific',
+        'w2v_specific': 'word2vec_specific'
     }
 
     try:

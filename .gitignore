@@ -12,4 +12,6 @@ dataset/news_cleaned.csv
 
 .vscode/
 
+specific-embeddings/
+
 run.sh

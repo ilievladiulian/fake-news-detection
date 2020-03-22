@@ -24,15 +24,21 @@ def load(embedding):
 
     train_data, test_data = dataset.split(stratified=True, split_ratio=0.8)
 
-    if embedding == 'glove':
-        TEXT.build_vocab(train_data, vectors=GloVe(name='6B', dim=300))
-    elif embedding == 'fasttext':
+    if embedding == 'glove_specific':
+        vectors = Vectors(name='glove.vec', cache='specific-embeddings')
+        TEXT.build_vocab(train_data, vectors=vectors)
+    elif embedding == 'glove_generic':
+        TEXT.build_vocab(train_data, vectors=GloVe(name='6B', dim=300, cache='.vector_cache'))
+    elif embedding == 'fasttext_specific':
+        fasttext_vectors = Vectors(name="fasttext.vec", cache="specific-embeddings")
+        TEXT.build_vocab(train_data, vectors=fasttext_vectors)
+    elif embedding == 'fasttext_generic':
         fasttext_vectors = Vectors(name="crawl-300d-2M.vec", cache=".fasttext_cache")
         TEXT.build_vocab(train_data, vectors=fasttext_vectors)
-    elif embedding == 'word2vec':
-        # w2vmodel = word2vec.KeyedVectors.load_word2vec_format('.word2vec_cache/GoogleNews-vectors-negative300.bin', binary=True, limit=1000000)
-        # w2vmodel.wv.save_word2vec_format('.word2vec_cache/embeddings.vec')
-        # w2vmodel = None
+    elif embedding == 'word2vec_specific':
+        word2vectors = Vectors(name='word2vec.vec', cache='specific-embeddings')
+        TEXT.build_vocab(train_data, vectors=word2vectors)
+    elif embedding == 'word2vec_generic':
         word2vectors = Vectors(name='embeddings.vec', cache='.word2vec_cache')
         TEXT.build_vocab(train_data, vectors=word2vectors)
 
