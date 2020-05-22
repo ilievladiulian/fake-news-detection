@@ -5,6 +5,7 @@ from rnn import RecurrentNN
 from cnn import ConvolutionalNN
 from lstm import LongShortTermMemory
 from lstm_attention import LongShortTermMemoryAttention
+from gru import GatedRecurrentUnit
 from metrics import metrics_handler
 import output_handler
 import torch
@@ -21,7 +22,8 @@ def main(argv):
         'rnn': RecurrentNN,
         'cnn': ConvolutionalNN,
         'lstm': LongShortTermMemory,
-        'lstm-attn': LongShortTermMemoryAttention
+        'lstm-attn': LongShortTermMemoryAttention,
+        'gru': GatedRecurrentUnit
     }
     outputFile = None
     classifierType = None

@@ -36,15 +36,16 @@ class MetricsHandler():
         return self.labels
 
     def getRecall(self):
-        print(self.trueLabels)
-        print(self.labels)
         recalls = {}
         for k, v in self.trueLabels.items():
-            truePositives = self.labels[k]["positive"]
-            falsePositives = self.labels[k]["negative"]
-            falseNegatives = self.trueLabels[k]["negative"]
+            if k in self.labels:
+                truePositives = self.labels[k]["positive"]
+                falsePositives = self.labels[k]["negative"]
+                falseNegatives = self.trueLabels[k]["negative"]
 
-            recalls[k] = float(float(truePositives) / (float(truePositives) + float(falseNegatives)))
+                recalls[k] = float(float(truePositives) / (float(truePositives) + float(falseNegatives)))
+            else:
+                recalls[k] = 0
 
         avgRecall = 0
         noItems = 0
@@ -57,11 +58,14 @@ class MetricsHandler():
     def getPrecision(self):
         precisions = {}
         for k, v in self.trueLabels.items():
-            truePositives = self.labels[k]["positive"]
-            falsePositives = self.labels[k]["negative"]
-            falseNegatives = self.trueLabels[k]["negative"]
+            if k in self.labels:
+                truePositives = self.labels[k]["positive"]
+                falsePositives = self.labels[k]["negative"]
+                falseNegatives = self.trueLabels[k]["negative"]
 
-            precisions[k] = float(float(truePositives) / (float(truePositives) + float(falsePositives)))
+                precisions[k] = float(float(truePositives) / (float(truePositives) + float(falsePositives)))
+            else:
+                precisions[k] = 0
 
         avgPrecision = 0
         noItems = 0
