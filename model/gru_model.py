@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 from torch.autograd import Variable
 from torch.nn import functional as F
+import env_settings
 
 class GRUClassifier(nn.Module):
 	def __init__(self, batch_size, output_size, hidden_size, vocab_size, embedding_length, weights):
@@ -50,9 +51,9 @@ class GRUClassifier(nn.Module):
 		input = input.permute(1, 0, 2) # input.size() = (num_sequences, batch_size, embedding_length)
 		if torch.cuda.is_available():
 			if batch_size is None:
-				h_0 = Variable(torch.zeros(1, self.batch_size, self.hidden_size).cuda()) # Initial hidden state of the LSTM
+				h_0 = Variable(torch.zeros(1, self.batch_size, self.hidden_size).cuda(env_settings.CUDA_DEVICE)) # Initial hidden state of the LSTM
 			else:
-				h_0 = Variable(torch.zeros(1, batch_size, self.hidden_size).cuda())
+				h_0 = Variable(torch.zeros(1, batch_size, self.hidden_size).cuda(env_settings.CUDA_DEVICE))
 		else:
 			if batch_size is None:
 				h_0 = Variable(torch.zeros(1, self.batch_size, self.hidden_size)) # Initial hidden state of the LSTM

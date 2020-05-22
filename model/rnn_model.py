@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 from torch.autograd import Variable
+import env_settings
 
 class RNN(nn.Module):
 	def __init__(self, batch_size, output_size, hidden_size, vocab_size, embedding_length, weights):
@@ -48,9 +49,9 @@ class RNN(nn.Module):
 		input = input.permute(1, 0, 2)
 		if torch.cuda.is_available():
 			if batch_size is None:
-				h_0 = Variable(torch.zeros(4, self.batch_size, self.hidden_size).cuda()) # 4 = num_layers*num_directions
+				h_0 = Variable(torch.zeros(4, self.batch_size, self.hidden_size).cuda(env_settings.CUDA_DEVICE)) # 4 = num_layers*num_directions
 			else:
-				h_0 =  Variable(torch.zeros(4, batch_size, self.hidden_size).cuda())
+				h_0 =  Variable(torch.zeros(4, batch_size, self.hidden_size).cuda(env_settings.CUDA_DEVICE))
 		else:
 			if batch_size is None:
 				h_0 = Variable(torch.zeros(4, self.batch_size, self.hidden_size)) # 4 = num_layers*num_directions

@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 from torch.autograd import Variable
 from torch.nn import functional as F
+import env_settings
 
 class RCNN(nn.Module):
 	def __init__(self, batch_size, output_size, hidden_size, vocab_size, embedding_length, weights):
@@ -61,13 +62,13 @@ class RCNN(nn.Module):
 		input = input.permute(1, 0, 2) # input.size() = (num_sequences, batch_size, embedding_length)
 		if torch.cuda.is_available():
 			if batch_size is None:
-				h_0 = Variable(torch.zeros(2, self.batch_size, self.hidden_size).cuda()) # Initial hidden state of the LSTM
-				c_0 = Variable(torch.zeros(2, self.batch_size, self.hidden_size).cuda()) # Initial cell state of the LSTM
+				h_0 = Variable(torch.zeros(2, self.batch_size, self.hidden_size).cuda(env_settings.CUDA_DEVICE)) # Initial hidden state of the LSTM
+				c_0 = Variable(torch.zeros(2, self.batch_size, self.hidden_size).cuda(env_settings.CUDA_DEVICE)) # Initial cell state of the LSTM
 				# h_0 = Variable(torch.zeros(2, self.batch_size, self.hidden_size)) # Initial hidden state of the LSTM
 				# c_0 = Variable(torch.zeros(2, self.batch_size, self.hidden_size)) # Initial cell state of the LSTM
 			else:
-				h_0 = Variable(torch.zeros(2, batch_size, self.hidden_size).cuda())
-				c_0 = Variable(torch.zeros(2, batch_size, self.hidden_size).cuda())
+				h_0 = Variable(torch.zeros(2, batch_size, self.hidden_size).cuda(env_settings.CUDA_DEVICE))
+				c_0 = Variable(torch.zeros(2, batch_size, self.hidden_size).cuda(env_settings.CUDA_DEVICE))
 				# h_0 = Variable(torch.zeros(2, batch_size, self.hidden_size))
 				# c_0 = Variable(torch.zeros(2, batch_size, self.hidden_size))
 		else:

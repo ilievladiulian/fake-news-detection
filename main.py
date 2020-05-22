@@ -6,6 +6,7 @@ from cnn import ConvolutionalNN
 from lstm import LongShortTermMemory
 from lstm_attention import LongShortTermMemoryAttention
 from gru import GatedRecurrentUnit
+from gru_attention import GatedRecurrentUnitAttention
 from metrics import metrics_handler
 import output_handler
 import torch
@@ -23,7 +24,8 @@ def main(argv):
         'cnn': ConvolutionalNN,
         'lstm': LongShortTermMemory,
         'lstm-attn': LongShortTermMemoryAttention,
-        'gru': GatedRecurrentUnit
+        'gru': GatedRecurrentUnit,
+        'gru-attn': GatedRecurrentUnitAttention
     }
     outputFile = None
     classifierType = None
@@ -79,6 +81,8 @@ def main(argv):
         print(f'Test Loss: {test_loss:.3f}, Test Acc: {test_acc:.2f}%')
         output_handler.outputFileHandler.write(f'Test Loss: {test_loss:.3f}, Test Acc: {test_acc:.2f}%\n')
 
+        torch.save(modelHandler.model.state_dict(), "./saved_models/" + modelName + "-" + embedding + "-" + classifierType)
+
         output_handler.outputFileHandler.write(f'Test recall: {metrics_handler.metricsHandler.getRecall():.3f}%\n')
         output_handler.outputFileHandler.write(f'Test precision: {metrics_handler.metricsHandler.getPrecision():.3f}%\n')
     elif classifierType == classifierTypePossibilities['repeater']:
@@ -96,15 +100,22 @@ def main(argv):
             print(f'Test Loss: {test_loss:.3f}, Test Acc: {test_acc:.2f}%')
             output_handler.outputFileHandler.write(f'Test Loss: {test_loss:.3f}, Test Acc: {test_acc:.2f}%\n')
 
+            torch.save(modelHandler.model.state_dict(), "./saved_models/" + modelName + "-" + embedding + "-" + classifierType + "-" + i)
+
             output_handler.outputFileHandler.write(f'Test recall: {metrics_handler.metricsHandler.getRecall():.3f}%\n')
             output_handler.outputFileHandler.write(f'Test precision: {metrics_handler.metricsHandler.getPrecision():.3f}%\n')
     else:
         modelHandler = modelHandlerName(embeddingPossibilities[embedding])
+
+        torch.save(modelHandler.model.state_dict(), "./saved_models/" + modelName + "-" + embedding + "-" + classifierType)
+        
         modelHandler.train(numberOfEpochs)
         metrics_handler.metricsHandler.reset()
         test_loss, test_acc = modelHandler.test()
         print(f'Test Loss: {test_loss:.3f}, Test Acc: {test_acc:.2f}%')
         output_handler.outputFileHandler.write(f'Test Loss: {test_loss:.3f}, Test Acc: {test_acc:.2f}%\n')
+
+        torch.save(modelHandler.model.state_dict(), "./saved_models/" + modelName + "-" + embedding + "-" + classifierType)
 
         output_handler.outputFileHandler.write(f'Test recall: {metrics_handler.metricsHandler.getRecall():.3f}%\n')
         output_handler.outputFileHandler.write(f'Test precision: {metrics_handler.metricsHandler.getPrecision():.3f}%\n')

@@ -1,0 +1,11 @@
+name: fake-news-classifier
+channels:
+  - defaults
+dependencies:
+  - numpy
+  - pytorch
+  - torchtext
+  - pymongo
+  - gensim
+  - cython
+

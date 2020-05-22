@@ -1,6 +1,7 @@
 import torch
 from torch.autograd import Variable
 from metrics import metrics_handler
+import env_settings
 
 class TrainingHandler():
     def __init__(self, optimizer, loss_fn):
@@ -16,7 +17,7 @@ class TrainingHandler():
         total_epoch_loss = 0
         total_epoch_acc = 0
         if torch.cuda.is_available():
-            model.cuda()
+            model.cuda(env_settings.CUDA_DEVICE)
         steps = 0
         model.train()
         for idx, batch in enumerate(train_iter):
@@ -24,8 +25,8 @@ class TrainingHandler():
             target = batch.label
             target = torch.autograd.Variable(target).long()
             if torch.cuda.is_available():
-                text = text.cuda()
-                target = target.cuda()
+                text = text.cuda(env_settings.CUDA_DEVICE)
+                target = target.cuda(env_settings.CUDA_DEVICE)
             if (text.size()[0] is not 4):
                 continue
             self.optimizer.zero_grad()
@@ -51,7 +52,7 @@ class TrainingHandler():
         total_epoch_acc = 0
         model.eval()
         if torch.cuda.is_available():
-            model.cuda()
+            model.cuda(env_settings.CUDA_DEVICE)
         with torch.no_grad():
             for idx, batch in enumerate(val_iter):
                 text = batch.content[0]
@@ -60,8 +61,8 @@ class TrainingHandler():
                 target = batch.label
                 target = torch.autograd.Variable(target).long()
                 if torch.cuda.is_available():
-                    text = text.cuda()
-                    target = target.cuda()
+                    text = text.cuda(env_settings.CUDA_DEVICE)
+                    target = target.cuda(env_settings.CUDA_DEVICE)
                 prediction = model(text)
                 loss = self.loss_fn(prediction, target)
                 predictedLabel = torch.max(prediction, 1)[1].view(target.size()).data
