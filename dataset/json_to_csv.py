@@ -39,11 +39,11 @@ random.shuffle(train_examples)
 random.shuffle(test_examples)
 
 with open(train_file_name, 'w') as train_file:
-    writer = csv.DictWriter(train_file, fieldnames=csv_columns)
+    train_file.write('%s,%s\n' % (LABEL, CONTENT))
     for example in train_examples:
-        writer.writerow(example)
+        train_file.write('\"%s\",\"%s\"\n' % (example[LABEL], example[CONTENT]))
 
 with open(test_file_name, 'w') as test_file:
-    writer = csv.DictWriter(test_file, fieldnames=csv_columns)
+    test_file.write('%s,%s\n' % (LABEL, CONTENT))
     for example in test_examples:
-        writer.writerow(example)
+        test_file.write('\"%s\",\"%s\"\n' % (example[LABEL], example[CONTENT]))

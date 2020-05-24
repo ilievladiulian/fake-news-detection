@@ -2,6 +2,10 @@
 
 dataset/news_cleaned.csv
 
+dataset/train.csv
+dataset/test.csv
+dataset/labels.txt
+
 .linear_vector_cache/
 
 .word2vec_cache/
