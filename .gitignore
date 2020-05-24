@@ -15,3 +15,7 @@ dataset/news_cleaned.csv
 specific-embeddings/
 
 run.sh
+
+saved_models/
+
+gan/ag_news_csv/
