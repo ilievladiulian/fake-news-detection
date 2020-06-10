@@ -2,6 +2,7 @@ import sys, getopt
 from logistic_regression import LogisticRegression
 from recurrent_cnn import RecurrentConvolutionalNN
 from rnn import RecurrentNN
+from rnn_attention import RecurrentNNAttention
 from cnn import ConvolutionalNN
 from lstm import LongShortTermMemory
 from lstm_attention import LongShortTermMemoryAttention
@@ -10,6 +11,7 @@ from gru_attention import GatedRecurrentUnitAttention
 from metrics import metrics_handler
 import output_handler
 import torch
+import env_settings
 
 def init(filename):
     output_handler.outputFileHandler = output_handler.OutputHandler(filename)
@@ -21,6 +23,7 @@ def main(argv):
         'logreg': LogisticRegression,
         'rcnn': RecurrentConvolutionalNN,
         'rnn': RecurrentNN,
+        'rnn-attn': RecurrentNNAttention,
         'cnn': ConvolutionalNN,
         'lstm': LongShortTermMemory,
         'lstm-attn': LongShortTermMemoryAttention,
@@ -45,7 +48,7 @@ def main(argv):
     }
 
     try:
-        opts, args = getopt.getopt(argv, 'hmote:', ['help', 'model=', 'output=', 'type=', 'embedding='])
+        opts, args = getopt.getopt(argv, 'hmote:', ['help', 'model=', 'output=', 'type=', 'embedding=', 'gpu='])
     except getopt.GetoptError:
         print('usage: main.py -m <modelname> or main.py --model=<modelname>, where <modelname>: rnn, lstm, cnn, rcnn or logreg')
         sys.exit(2)
@@ -61,6 +64,8 @@ def main(argv):
             classifierType = arg
         elif opt in ('-e', '--embedding'):
             embedding = arg
+        elif opt in ('-g', '--gpu'):
+            env_settings.CUDA_DEVICE = 'cuda:' + arg
     
     modelHandlerName = modelPossibilities.get(modelName, 'Invalid model')
     if modelHandlerName == 'Invalid model':
@@ -70,7 +75,7 @@ def main(argv):
     init(outputFile)
     output_handler.outputFileHandler.write("Start log \n")
 
-    numberOfEpochs = 10
+    numberOfEpochs = 100
 
     if classifierType == classifierTypePossibilities['longer']:
         numberOfEpochs = 20
@@ -80,9 +85,6 @@ def main(argv):
         test_loss, test_acc = modelHandler.test()
         print(f'Test Loss: {test_loss:.3f}, Test Acc: {test_acc:.2f}%')
         output_handler.outputFileHandler.write(f'Test Loss: {test_loss:.3f}, Test Acc: {test_acc:.2f}%\n')
-
-        torch.save(modelHandler.model.state_dict(), "./saved_models/" + modelName + "-" + embedding + "-" + classifierType)
-
         output_handler.outputFileHandler.write(f'Test recall: {metrics_handler.metricsHandler.getRecall():.3f}%\n')
         output_handler.outputFileHandler.write(f'Test precision: {metrics_handler.metricsHandler.getPrecision():.3f}%\n')
     elif classifierType == classifierTypePossibilities['repeater']:
@@ -99,24 +101,15 @@ def main(argv):
             test_loss, test_acc = modelHandler.test()
             print(f'Test Loss: {test_loss:.3f}, Test Acc: {test_acc:.2f}%')
             output_handler.outputFileHandler.write(f'Test Loss: {test_loss:.3f}, Test Acc: {test_acc:.2f}%\n')
-
-            torch.save(modelHandler.model.state_dict(), "./saved_models/" + modelName + "-" + embedding + "-" + classifierType + "-" + i)
-
             output_handler.outputFileHandler.write(f'Test recall: {metrics_handler.metricsHandler.getRecall():.3f}%\n')
             output_handler.outputFileHandler.write(f'Test precision: {metrics_handler.metricsHandler.getPrecision():.3f}%\n')
     else:
         modelHandler = modelHandlerName(embeddingPossibilities[embedding])
-
-        torch.save(modelHandler.model.state_dict(), "./saved_models/" + modelName + "-" + embedding + "-" + classifierType)
-        
         modelHandler.train(numberOfEpochs)
         metrics_handler.metricsHandler.reset()
         test_loss, test_acc = modelHandler.test()
         print(f'Test Loss: {test_loss:.3f}, Test Acc: {test_acc:.2f}%')
         output_handler.outputFileHandler.write(f'Test Loss: {test_loss:.3f}, Test Acc: {test_acc:.2f}%\n')
-
-        torch.save(modelHandler.model.state_dict(), "./saved_models/" + modelName + "-" + embedding + "-" + classifierType)
-
         output_handler.outputFileHandler.write(f'Test recall: {metrics_handler.metricsHandler.getRecall():.3f}%\n')
         output_handler.outputFileHandler.write(f'Test precision: {metrics_handler.metricsHandler.getPrecision():.3f}%\n')
 

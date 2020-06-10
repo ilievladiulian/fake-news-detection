@@ -44,7 +44,7 @@ class Csv_DataSet(Dataset):
             next(reader)  # skip header
             for idx, row in enumerate(reader):
                 # get actions
-                content = row[1]+' '+row[2]
+                content = row[1]
                 content = content.strip()
                 if lowercase:
                     content = content.lower()

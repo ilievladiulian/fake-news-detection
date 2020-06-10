@@ -18,8 +18,10 @@ dataset/labels.txt
 
 specific-embeddings/
 
-run.sh
+*.sh
 
 saved_models/
 
 gan/ag_news_csv/
+
+ag_news_csv/

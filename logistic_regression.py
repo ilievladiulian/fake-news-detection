@@ -6,10 +6,12 @@ import dataset.load_dataset as load_dataset
 from training_handler import TrainingHandler
 import output_handler
 from model.logistic_regression_model import LogisticRegressionModel
+import numpy as np
 
 class LogisticRegression():
     def __init__(self, embedding):
         TEXT, vocab_size, word_embeddings, self.train_iter, self.valid_iter, self.test_iter = load_dataset.load(embedding=embedding)
+        self.embedding = embedding
 
         output_size = 10
         learning_rate = 2e-5
@@ -21,6 +23,9 @@ class LogisticRegression():
         self.training_handler = TrainingHandler(optimizer, loss_fn)
 
     def train(self, numberOfEpochs):
+        patience_threshold = 3
+        patience = patience_threshold
+        min_valid_loss = np.Inf
         for epoch in range(numberOfEpochs):
             if torch.cuda.is_available():
                 torch.cuda.empty_cache()
@@ -28,6 +33,15 @@ class LogisticRegression():
             val_loss, val_acc = self.training_handler.eval_model(self.model, self.valid_iter)
             print(f'Epoch: {epoch+1:02}, Train Loss: {train_loss:.3f}, Train Acc: {train_acc:.2f}%, Val. Loss: {val_loss:3f}, Val. Acc: {val_acc:.2f}%')
             output_handler.outputFileHandler.write(f'Epoch: {epoch+1:02}, Train Loss: {train_loss:.3f}, Train Acc: {train_acc:.2f}%, Val. Loss: {val_loss:3f}, Val. Acc: {val_acc:.2f}%')
+
+            patience -= 1
+            if val_loss < min_valid_loss and abs(min_valid_loss - val_loss) > 0.005:
+                patience = patience_threshold
+                torch.save(self.model.state_dict(), "./saved_models/log-reg-" + self.embedding)
+                min_valid_loss = val_loss
+
+            if patience == 0:
+                break
 
     def test(self):
         test_loss, test_acc = self.training_handler.eval_model(self.model, self.test_iter)

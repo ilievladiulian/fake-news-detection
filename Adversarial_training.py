@@ -14,6 +14,8 @@ import gan.data as data
 import pandas as pd
 
 import env_settings
+from metrics import metrics_handler
+import output_handler
 
 parser = argparse.ArgumentParser(description='PyTorch RNN/LSTM classification Model')
 parser.add_argument('--data', type=str, default=os.getcwd()+'/ag_news_csv/',
@@ -65,7 +67,9 @@ parser.add_argument('--pre_train', type=str,
                     default=os.getcwd()+'/ag_lm_model/',
                     help='path to save the final model')
 parser.add_argument('--embedding', type=str,
-                    default='glv', help='embedding vectors to use')
+                    default='glove_specific', help='embedding vectors to use')
+parser.add_argument('--output_file', type=str,
+                    default='~/fake-news-master/results/gan-glove_specific.txt', help='metrics output file')
 
 args = parser.parse_args()
 
@@ -84,6 +88,10 @@ torch.manual_seed(args.seed)
 if torch.cuda.is_available():
     if not args.cuda:
         print("WARNING: You have a CUDA device, so you should probably run with --cuda")
+
+metrics_handler.metricsHandler = metrics_handler.MetricsHandler()
+metrics_handler.metricsHandler.reset()
+output_handler.outputFileHandler = output_handler.OutputHandler(args.output_file)
 
 ###############################################################################
 # Load data
@@ -158,10 +166,10 @@ judger = judge.RNNModel(args.model, ntokens, args.emsize, args.nhid,
 
 criterion = nn.CrossEntropyLoss(reduction='none')
 criterion_judge = nn.BCELoss()
-dis_optimizer = torch.optim.SGD(discriminator.parameters(), lr=dis_learning_rate, momentum=0.9)
+dis_optimizer = torch.optim.Adam(discriminator.parameters(), lr=dis_learning_rate, weight_decay=0.0005)
 dis_scheduler = torch.optim.lr_scheduler.StepLR(dis_optimizer, step_size=10, gamma=args.reduce_rate)
 
-judge_optimizer = torch.optim.SGD(judger.parameters(), lr=judge_learning_rate, momentum=0.9)
+judge_optimizer = torch.optim.Adam(judger.parameters(), lr=judge_learning_rate, weight_decay=0.0005)
 judge_scheduler = torch.optim.lr_scheduler.StepLR(judge_optimizer, step_size=5, gamma=args.reduce_rate)
 
 ###############################################################################
@@ -304,7 +312,7 @@ def adv_train_step(judge_only=True):
 
 def train(epoch=None):
     # 1. pre_train discriminator.
-    if epoch < 30:#30
+    if epoch < 20:#30
         num_iter = len(labeled_train_data) // args.batch_size
         start_time = time.time()
         total_loss = 0
@@ -319,7 +327,7 @@ def train(epoch=None):
     # 2. pre_train judger and adv train.
     else:
         judge_scheduler.step()
-        if epoch < 205:#35
+        if epoch < 50:#35
             judge_only = True
             current_process = 'Pre_train judger: '
         else:
@@ -370,8 +378,15 @@ def evaluate():
             _, predict_class = torch.max(output,1)
             total += labels.size(0)
             correct += (predict_class == labels).sum().item()
-        print('Accuracy of the classifier on the test data is : {:5.4f}'.format(
-                100 * correct / total))
+
+            for i_metric in range(list(predict_class.size())[0]):
+                metrics_handler.metricsHandler.update((predict_class.data)[i_metric].item(), (labels.data)[i_metric].item())
+        test_acc = 100 * correct / total
+        print('Accuracy of the classifier on the test data is : {:5.4f}'.format(test_acc))
+
+        output_handler.outputFileHandler.write(f'Test Acc: {test_acc:.2f}%\n')
+        output_handler.outputFileHandler.write(f'Test recall: {metrics_handler.metricsHandler.getRecall():.3f}%\n')
+        output_handler.outputFileHandler.write(f'Test precision: {metrics_handler.metricsHandler.getPrecision():.3f}%\n')
         return correct / total
 
 

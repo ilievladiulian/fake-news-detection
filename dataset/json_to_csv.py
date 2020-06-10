@@ -16,7 +16,7 @@ labels_map = {}
 no_examples = {}
 
 for i in range(len(labels)):
-    labels_map[labels[i]] = str(i)
+    labels_map[labels[i]] = str(i+1)
     no_examples[labels[i]] = 0
 
 with open(labels_file_name, 'w') as labels_file:
@@ -28,7 +28,7 @@ test_examples = []
 
 for document in collection.find():
     current_label = document[LABEL]
-    current_doc = { LABEL: labels_map[current_label], CONTENT: document[CONTENT].replace('\n', '').replace('\t', '') }
+    current_doc = { LABEL: labels_map[current_label], CONTENT: document[CONTENT].replace('\n', '').replace('\t', '').replace('\'', '').replace('\"', '') }
     no_examples[current_label] += 1
     if no_examples[current_label] <= 7000:
         train_examples.append(current_doc)
@@ -39,11 +39,9 @@ random.shuffle(train_examples)
 random.shuffle(test_examples)
 
 with open(train_file_name, 'w') as train_file:
-    train_file.write('%s,%s\n' % (LABEL, CONTENT))
     for example in train_examples:
         train_file.write('\"%s\",\"%s\"\n' % (example[LABEL], example[CONTENT]))
 
 with open(test_file_name, 'w') as test_file:
-    test_file.write('%s,%s\n' % (LABEL, CONTENT))
     for example in test_examples:
         test_file.write('\"%s\",\"%s\"\n' % (example[LABEL], example[CONTENT]))

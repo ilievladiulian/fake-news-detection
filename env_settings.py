@@ -1,23 +1,33 @@
 import torch
 import gensim
+import torchtext.vocab as vocab
 
-CUDA_DEVICE = 0
+CUDA_DEVICE = 3
 
 device = torch.cuda.device(CUDA_DEVICE)
 
 def get_embedding_weights(embedding):
-    model = None
+    embeddings_file = ''
+    cache = ''
     if embedding == 'glove_specific':
-        model = gensim.models.KeyedVectors.load_word2vec_format('./specific-embeddings/glove.vec')
+        embeddings_file='glove.vec'
+        cache='specific-embeddings'
     elif embedding == 'glove_generic':
-        model = gensim.models.KeyedVectors.load_word2vec_format('./.vector_cache/glove.6B.300d.txt')
+        embeddings_file='glove.6B.300d.txt'
+        cache='.vector_cache'
     elif embedding == 'fasttext_specific':
-        model = gensim.models.KeyedVectors.load_word2vec_format('./specific-embeddings/fasttext.vec')
+        embeddings_file = 'fasttext.vec'
+        cache = 'specific-embeddings'
     elif embedding == 'fasttext_generic':
-        model = gensim.models.KeyedVectors.load_word2vec_format('./.fasttext-cache/crawl-300d-2M.vec')
+        embeddings_file = 'crawl-300d-2M.vec'
+        cache = '.fasttext_cache'
     elif embedding == 'word2vec_specific':
-        model = gensim.models.KeyedVectors.load_word2vec_format('./specific-embeddings/word2vec.vec')
+        embeddings_file = 'word2vec.vec'
+        cache = 'specific-embeddings'
     elif embedding == 'word2vec_generic':
-        model = gensim.models.KeyedVectors.load_word2vec_format('./.word2vec_cache/embeddings.vec')
+        embeddings_file = 'embeddings.vec'
+        cache = '.word2vec_cache'
+
+    model = vocab.Vectors(name=embeddings_file, cache=cache)
 
     return torch.nn.Parameter(torch.FloatTensor(model.vectors), requires_grad=False)
