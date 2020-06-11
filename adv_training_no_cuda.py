@@ -94,7 +94,6 @@ metrics_handler.metricsHandler = metrics_handler.MetricsHandler()
 metrics_handler.metricsHandler.reset()
 output_handler.outputFileHandler = output_handler.OutputHandler(args.output_file)
 
-
 ###############################################################################
 # Build the model
 ###############################################################################
@@ -324,9 +323,11 @@ def evaluate():
     discriminator.eval()
     with torch.no_grad():
         for i_batch, sample_batched in enumerate(test_loader):
-            token_seqs = torch.from_numpy(np.transpose(sample_batched[0]))
-            labels = torch.from_numpy(np.transpose(sample_batched[3]))
-            seq_lengths = np.transpose(sample_batched[4])
+            token_seqs = sample_batched.content[0]
+            seq_lengths = np.array([len(seq) for seq in token_seqs])
+            labels = lab_batch.label
+            token_seqs = torch.from_numpy(np.transpose(token_seqs.numpy()))
+            labels = torch.from_numpy(np.transpose(labels.numpy()))
             hidden = discriminator.init_hidden(token_seqs.shape[1])
             output = discriminator(token_seqs, hidden, seq_lengths)
             _, predict_class = torch.max(output,1)

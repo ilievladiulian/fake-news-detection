@@ -324,7 +324,7 @@ def evaluate():
     with torch.no_grad():
         for i_batch, sample_batched in enumerate(test_loader):
             token_seqs = sample_batched.content[0]
-            seq_lengths = np.array([len(seq) for seq in lab_token_seqs])
+            seq_lengths = np.array([len(seq) for seq in token_seqs])
             labels = lab_batch.label
             token_seqs = torch.from_numpy(np.transpose(token_seqs.numpy())).cuda(env_settings.CUDA_DEVICE)
             labels = torch.from_numpy(np.transpose(labels.numpy())).cuda(env_settings.CUDA_DEVICE)
