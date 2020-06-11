@@ -12,12 +12,11 @@ def weights_init(m):
 class RNNModel(nn.Module):
     """Container module with an encoder, a recurrent module, and a decoder."""
 
-    def __init__(self, rnn_type, ntoken, ninp, nhid, nlayers, nclass, embedding,
+    def __init__(self, rnn_type, ntoken, ninp, nhid, nlayers, nclass, embedding_weights,
                  dropout_em=0.5,dropout_rnn=0,dropout_out=0, tie_weights=False, n_cl_hidden=30):
         super(RNNModel, self).__init__()
         self.drop_em = nn.Dropout(dropout_em)
-        self.encoder = nn.Embedding(ntoken, ninp)
-        self.encoder.weight = env_settings.get_embedding_weights(embedding)
+        self.encoder = nn.Embedding.from_pretrained(embedding_weights)
         if rnn_type in ['LSTM', 'GRU']:
             self.rnn = getattr(nn, rnn_type)(ninp, nhid, nlayers, dropout=dropout_rnn)
         else:

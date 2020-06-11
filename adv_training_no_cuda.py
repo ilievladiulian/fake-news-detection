@@ -94,6 +94,7 @@ metrics_handler.metricsHandler = metrics_handler.MetricsHandler()
 metrics_handler.metricsHandler.reset()
 output_handler.outputFileHandler = output_handler.OutputHandler(args.output_file)
 
+
 ###############################################################################
 # Build the model
 ###############################################################################
@@ -104,10 +105,10 @@ ntokens, embedding_vectors, labeled_train_loader, unlabeled_train_loader, test_l
 
 discriminator = discriminator.RNNModel(args.model, ntokens, args.emsize, args.nhid,
                        args.nlayers, args.nclass, embedding_vectors, args.dropout_em, 
-                       args.dropout_rnn, args.dropout_cl, args.tied).cuda(env_settings.CUDA_DEVICE)
+                       args.dropout_rnn, args.dropout_cl, args.tied)
 judger = judge.RNNModel(args.model, ntokens, args.emsize, args.nhid,
                        args.nlayers, args.nclass, embedding_vectors, args.dropout_em, 
-                       args.dropout_rnn, args.dropout_cl, args.tied).cuda(env_settings.CUDA_DEVICE)
+                       args.dropout_rnn, args.dropout_cl, args.tied)
 
 criterion = nn.CrossEntropyLoss(reduction='none')
 criterion_judge = nn.CrossEntropyLoss(reduction='none')
@@ -142,8 +143,8 @@ def dis_pre_train_step():
     lab_token_seqs = lab_batch.content[0]
     lab_seq_lengths = np.array([len(seq) for seq in lab_token_seqs])
     labels = lab_batch.label
-    lab_token_seqs = torch.from_numpy(np.transpose(lab_token_seqs.numpy())).cuda(env_settings.CUDA_DEVICE)
-    labels = torch.from_numpy(np.transpose(labels.numpy())).cuda(env_settings.CUDA_DEVICE)
+    lab_token_seqs = torch.from_numpy(np.transpose(lab_token_seqs.numpy()))
+    labels = torch.from_numpy(np.transpose(labels.numpy()))
     num_lab_sample = lab_token_seqs.shape[1]
     lab_hidden = discriminator.init_hidden(num_lab_sample)
     lab_output = discriminator(lab_token_seqs, lab_hidden, lab_seq_lengths)
@@ -181,15 +182,15 @@ def adv_train_step(judge_only=True):
     lab_token_seqs = lab_batch.content[0]
     lab_seq_lengths = np.array([len(seq) for seq in lab_token_seqs])
     labels = lab_batch.label
-    lab_token_seqs = torch.from_numpy(np.transpose(lab_token_seqs.numpy())).cuda(env_settings.CUDA_DEVICE)
-    labels = torch.from_numpy(np.transpose(labels.numpy())).cuda(env_settings.CUDA_DEVICE)
+    lab_token_seqs = torch.from_numpy(np.transpose(lab_token_seqs.numpy()))
+    labels = torch.from_numpy(np.transpose(labels.numpy()))
     num_lab_sample = lab_token_seqs.shape[1]
     
     # Sample m labeled instances from DU and predict their corresponding label
     unl_batch = next(unlabeled_train_loader)
     unl_token_seqs = unl_batch.content[0]
     unl_seq_lengths = [len(seq) for seq in unl_token_seqs]
-    unl_token_seqs = torch.from_numpy(np.transpose(unl_token_seqs.numpy())).cuda(env_settings.CUDA_DEVICE)
+    unl_token_seqs = torch.from_numpy(np.transpose(unl_token_seqs.numpy()))
     num_unl_sample = unl_token_seqs.shape[1]
     unl_hidden = discriminator.init_hidden(num_unl_sample)
     unl_output = discriminator(unl_token_seqs, unl_hidden, unl_seq_lengths)
@@ -204,14 +205,14 @@ def adv_train_step(judge_only=True):
         # Update the judge model
         ###############################################################################
         lab_judge_hidden = judger.init_hidden(num_lab_sample)
-        one_hot_label = one_hot_embedding(labels, args.nclass).cuda(env_settings.CUDA_DEVICE)  # one hot encoder
+        one_hot_label = one_hot_embedding(labels, args.nclass)  # one hot encoder
         lab_judge_prob = judger(lab_token_seqs, lab_judge_hidden, lab_seq_lengths, one_hot_label)
-        lab_labeled = torch.ones(num_lab_sample).cuda(env_settings.CUDA_DEVICE)
+        lab_labeled = torch.ones(num_lab_sample)
 
         unl_judge_hidden = judger.init_hidden(num_unl_sample)
-        one_hot_unl = one_hot_embedding(fake_labels, args.nclass).cuda(env_settings.CUDA_DEVICE)  # one hot encoder
+        one_hot_unl = one_hot_embedding(fake_labels, args.nclass)  # one hot encoder
         unl_judge_prob = judger(unl_token_seqs, unl_judge_hidden, unl_seq_lengths, one_hot_unl)
-        unl_labeled = torch.zeros(num_unl_sample).cuda(env_settings.CUDA_DEVICE)
+        unl_labeled = torch.zeros(num_unl_sample)
         
         if_labeled = torch.cat((lab_labeled, unl_labeled))
         all_judge_prob = torch.cat((lab_judge_prob, unl_judge_prob))
@@ -323,11 +324,9 @@ def evaluate():
     discriminator.eval()
     with torch.no_grad():
         for i_batch, sample_batched in enumerate(test_loader):
-            token_seqs = sample_batched.content[0]
-            seq_lengths = np.array([len(seq) for seq in lab_token_seqs])
-            labels = lab_batch.label
-            token_seqs = torch.from_numpy(np.transpose(token_seqs.numpy())).cuda(env_settings.CUDA_DEVICE)
-            labels = torch.from_numpy(np.transpose(labels.numpy())).cuda(env_settings.CUDA_DEVICE)
+            token_seqs = torch.from_numpy(np.transpose(sample_batched[0]))
+            labels = torch.from_numpy(np.transpose(sample_batched[3]))
+            seq_lengths = np.transpose(sample_batched[4])
             hidden = discriminator.init_hidden(token_seqs.shape[1])
             output = discriminator(token_seqs, hidden, seq_lengths)
             _, predict_class = torch.max(output,1)

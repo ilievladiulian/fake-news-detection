@@ -2,7 +2,7 @@ import torch
 import gensim
 import torchtext.vocab as vocab
 
-CUDA_DEVICE = 3
+CUDA_DEVICE = 2
 
 device = torch.cuda.device(CUDA_DEVICE)
 
@@ -30,4 +30,4 @@ def get_embedding_weights(embedding):
 
     model = vocab.Vectors(name=embeddings_file, cache=cache)
 
-    return torch.nn.Parameter(torch.FloatTensor(model.vectors), requires_grad=False)
+    return torch.FloatTensor(model.vectors)
