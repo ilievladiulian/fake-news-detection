@@ -399,6 +399,8 @@ try:
 ###############################################################################
 # this is the training loop and each loop run a batch
     best_accuracy = 0
+    patience_threshold = 3
+    patience = patience_threshold
     for epoch in range(start_epoch, args.epochs + 1):
         epoch_start_time = time.time()
         dis_scheduler.step()
@@ -406,6 +408,9 @@ try:
         current_accuracy = evaluate()
         cdf = pd.DataFrame([[epoch, current_accuracy]], columns=['batch', 'accuracy'])
         all_result_df = all_result_df.append(cdf, ignore_index=True)
+
+        if epoch > 50:
+            patience -= 1
         # Save the model if the validation loss is the best we've seen so far.
         if current_accuracy > best_accuracy:
             best_accuracy = current_accuracy
@@ -413,6 +418,10 @@ try:
                 torch.save(discriminator, f)
             with open(os.path.join(args.save, 'judger.pt'), 'wb') as f:
                 torch.save(judger, f)
+            patience = patience_threshold
+        
+        if patience == 0:
+            break
 
 ###############################################################################
 # save the result and the final checkpoint
