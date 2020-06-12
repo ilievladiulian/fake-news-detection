@@ -91,7 +91,6 @@ if torch.cuda.is_available():
         print("WARNING: You have a CUDA device, so you should probably run with --cuda")
 
 metrics_handler.metricsHandler = metrics_handler.MetricsHandler()
-metrics_handler.metricsHandler.reset()
 output_handler.outputFileHandler = output_handler.OutputHandler(args.output_file)
 
 ###############################################################################
@@ -100,7 +99,7 @@ output_handler.outputFileHandler = output_handler.OutputHandler(args.output_file
 dis_learning_rate = args.lr
 judge_learning_rate = args.lr
 
-ntokens, embedding_vectors, labeled_train_loader, unlabeled_train_loader, test_loader, labeled_data_length, unlabeled_data_length = dataset.load(args.embedding)
+ntokens, embedding_vectors, labeled_train_loader, unlabeled_train_loader, valid_loader, test_loader, labeled_data_length, unlabeled_data_length = dataset.load(args.embedding)
 
 discriminator = discriminator.RNNModel(args.model, ntokens, args.emsize, args.nhid,
                        args.nlayers, args.nclass, embedding_vectors, args.dropout_em, 
@@ -316,13 +315,16 @@ def train(epoch=None):
 ###############################################################################
 
 
-def evaluate():
+def evaluate(test=False):
     # Turn on evaluate mode which disables dropout.
     correct = 0
     total = 0
     discriminator.eval()
+    current_loader = valid_loader
+    if test:
+        current_loader = test_loader
     with torch.no_grad():
-        for i_batch, sample_batched in enumerate(test_loader):
+        for i_batch, sample_batched in enumerate(current_loader):
             token_seqs = sample_batched.content[0]
             seq_lengths = np.array([len(seq) for seq in token_seqs])
             labels = sample_batched.label
@@ -339,9 +341,14 @@ def evaluate():
         test_acc = 100 * correct / total
         print('Accuracy of the classifier on the test data is : {:5.4f}'.format(test_acc))
 
-        output_handler.outputFileHandler.write(f'Test Acc: {test_acc:.2f}%\n')
-        output_handler.outputFileHandler.write(f'Test recall: {metrics_handler.metricsHandler.getRecall():.3f}%\n')
-        output_handler.outputFileHandler.write(f'Test precision: {metrics_handler.metricsHandler.getPrecision():.3f}%\n')
+        if test:
+            output_handler.outputFileHandler.write(f'Test Acc: {test_acc:.2f}%\n')
+            output_handler.outputFileHandler.write(f'Test recall: {metrics_handler.metricsHandler.getRecall():.3f}%\n')
+            output_handler.outputFileHandler.write(f'Test precision: {metrics_handler.metricsHandler.getPrecision():.3f}%\n')
+        else:
+            output_handler.outputFileHandler.write(f'Valid Acc: {test_acc:.2f}%\n')
+            output_handler.outputFileHandler.write(f'Valid recall: {metrics_handler.metricsHandler.getRecall():.3f}%\n')
+            output_handler.outputFileHandler.write(f'Valid precision: {metrics_handler.metricsHandler.getPrecision():.3f}%\n')
         return correct / total
 
 
@@ -402,6 +409,7 @@ try:
     patience_threshold = 3
     patience = patience_threshold
     for epoch in range(start_epoch, args.epochs + 1):
+        metrics_handler.metricsHandler.reset()
         epoch_start_time = time.time()
         dis_scheduler.step()
         train(epoch=epoch)
@@ -423,6 +431,10 @@ try:
         if patience == 0:
             break
 
+    metrics_handler.metricsHandler.reset()
+    discriminator.load_state_dict(torch.load(os.path.join(args.save, 'discriminator.pt')))
+    judge.load_state_dict(torch.load(os.path.join(args.save, 'judger.pt')))
+    evaluate(test=True)
 ###############################################################################
 # save the result and the final checkpoint
     all_result_df.to_csv(result_file, index=False, header=True)
