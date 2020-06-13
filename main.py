@@ -8,6 +8,7 @@ from lstm import LongShortTermMemory
 from lstm_attention import LongShortTermMemoryAttention
 from gru import GatedRecurrentUnit
 from gru_attention import GatedRecurrentUnitAttention
+from rnn_bidirectional import BiRecurrentNN
 from metrics import metrics_handler
 import output_handler
 import torch
@@ -24,6 +25,7 @@ def main(argv):
         'rcnn': RecurrentConvolutionalNN,
         'rnn': RecurrentNN,
         'rnn-attn': RecurrentNNAttention,
+        'birnn': BiRecurrentNN,
         'cnn': ConvolutionalNN,
         'lstm': LongShortTermMemory,
         'lstm-attn': LongShortTermMemoryAttention,
