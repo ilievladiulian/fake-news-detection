@@ -24,13 +24,8 @@ class MetricsHandler():
             self.trueLabels[trueLabel]["negative"] += 1
 
     def reset(self):
-        for k, v in self.labels.items():
-            self.labels[k]["positive"] = 0
-            self.labels[k]["negative"] = 0
-
-        for k, v in self.trueLabels.items():
-            self.trueLabels[k]["positive"] = 0
-            self.trueLabels[k]["negative"] = 0
+        self.labels = {}
+        self.trueLabels = {}
 
     def getMetrics(self):
         return self.labels

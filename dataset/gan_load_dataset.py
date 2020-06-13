@@ -69,4 +69,4 @@ def load(embedding, batch_size=4):
 
     vocab_size = len(TEXT.vocab)
 
-    return vocab_size, word_embeddings, labeled_data_iter, unlabeled_data_iter, valid_iter, test_iter, len(labeled_data), len(unlabeled_data)
+    return vocab_size, word_embeddings, labeled_data_iter, unlabeled_data_iter, valid_iter, test_iter, len(labeled_data), len(unlabeled_data), len(valid_data), len(test_data)

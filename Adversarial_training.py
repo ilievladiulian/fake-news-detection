@@ -104,7 +104,7 @@ def cycle(iterable):
         for x in iterable:
             yield x
 
-ntokens, embedding_vectors, labeled_train_loader, unlabeled_train_loader, valid_loader, test_loader, labeled_data_length, unlabeled_data_length = dataset.load(args.embedding, batch_size=args.batch_size)
+ntokens, embedding_vectors, labeled_train_loader, unlabeled_train_loader, valid_loader, test_loader, labeled_data_length, unlabeled_data_length, valid_length, test_length = dataset.load(args.embedding, batch_size=args.batch_size)
 
 labeled_train_loader = iter(cycle(labeled_train_loader))
 unlabeled_train_loader = iter(cycle(unlabeled_train_loader))
@@ -197,7 +197,7 @@ def adv_train_step(judge_only=True):
     # Sample m labeled instances from DU and predict their corresponding label
     unl_batch = next(unlabeled_train_loader)
     unl_token_seqs = unl_batch.content[0]
-    unl_seq_lengths = [len(seq) for seq in unl_token_seqs]
+    unl_seq_lengths = np.array([len(seq) for seq in unl_token_seqs])
     unl_token_seqs = torch.from_numpy(np.transpose(unl_token_seqs.numpy())).cuda(env_settings.CUDA_DEVICE)
     num_unl_sample = unl_token_seqs.shape[1]
     unl_hidden = discriminator.init_hidden(num_unl_sample)
@@ -272,9 +272,9 @@ def adv_train_step(judge_only=True):
 # Training process
 ###############################################################################
 
-def train(epoch=None):
+def train(epoch=None, phase=None):
     # 1. pre_train discriminator.
-    if epoch < 20:#30
+    if phase == 'discriminator_only':#30
         num_iter = labeled_data_length // args.batch_size
         start_time = time.time()
         total_loss = 0
@@ -289,7 +289,7 @@ def train(epoch=None):
     # 2. pre_train judger and adv train.
     else:
         judge_scheduler.step()
-        if epoch < 50:#35
+        if phase == 'judge_only':#35
             judge_only = True
             current_process = 'Pre_train judger: '
         else:
@@ -331,10 +331,13 @@ def evaluate(test=False):
     total = 0
     discriminator.eval()
     current_loader = valid_loader
+    current_length = valid_length
     if test:
         current_loader = test_loader
+        current_length = test_length
     with torch.no_grad():
-        for i_batch, sample_batched in enumerate(current_loader):
+        for i_batch in range(current_length):
+            sample_batched = next(current_loader)
             token_seqs = sample_batched.content[0]
             seq_lengths = np.array([len(seq) for seq in token_seqs])
             labels = sample_batched.label
@@ -418,17 +421,21 @@ try:
     best_accuracy = 0
     patience_threshold = 3
     patience = patience_threshold
+    phase = 'discriminator_only'
     for epoch in range(start_epoch, args.epochs + 1):
+        if epoch == 30 and phase == 'discriminator_only':
+            phase = 'judge_only'
+        if epoch == 50 and phase == 'judge_only':
+            phase = 'adversarial_training'
         metrics_handler.metricsHandler.reset()
         epoch_start_time = time.time()
         dis_scheduler.step()
-        train(epoch=epoch)
+        train(epoch=epoch, phase=phase)
         current_accuracy = evaluate()
         cdf = pd.DataFrame([[epoch, current_accuracy]], columns=['batch', 'accuracy'])
         all_result_df = all_result_df.append(cdf, ignore_index=True)
 
-        if epoch > 50:
-            patience -= 1
+        patience -= 1
         # Save the model if the validation loss is the best we've seen so far.
         if current_accuracy > best_accuracy:
             best_accuracy = current_accuracy
@@ -439,11 +446,20 @@ try:
             patience = patience_threshold
         
         if patience == 0:
-            break
+            if phase == 'discriminator_only':
+                discriminator = torch.load(os.path.join(args.save, 'discriminator.pt'))
+                phase = 'judge_only'
+                patience_threshold = patience_threshold
+            elif phase == 'judge_only':
+                judge = torch.load(os.path.join(args.save, 'judger.pt'))
+                phase = 'adversarial_training'
+                patience_threshold = patience_threshold
+            else:
+                break
 
     metrics_handler.metricsHandler.reset()
-    discriminator.load_state_dict(torch.load(os.path.join(args.save, 'discriminator.pt')))
-    judge.load_state_dict(torch.load(os.path.join(args.save, 'judger.pt')))
+    discriminator = torch.load(os.path.join(args.save, 'discriminator.pt'))
+    judge = torch.load(os.path.join(args.save, 'judger.pt'))
     evaluate(test=True)
 ###############################################################################
 # save the result and the final checkpoint
