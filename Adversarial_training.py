@@ -39,7 +39,7 @@ parser.add_argument('--nclass', type=int, default=4,
                     help='number of class in classification')
 parser.add_argument('--epochs', type=int, default=400,
                     help='upper epoch limit')
-parser.add_argument('--batch_size', type=int, default=10, metavar='N',
+parser.add_argument('--batch_size', type=int, default=4, metavar='N',
                     help='batch size')
 parser.add_argument('--bptt', type=int, default=35,
                     help='sequence length')
@@ -99,7 +99,17 @@ output_handler.outputFileHandler = output_handler.OutputHandler(args.output_file
 dis_learning_rate = args.lr
 judge_learning_rate = args.lr
 
-ntokens, embedding_vectors, labeled_train_loader, unlabeled_train_loader, valid_loader, test_loader, labeled_data_length, unlabeled_data_length = dataset.load(args.embedding)
+def cycle(iterable):
+    while True:
+        for x in iterable:
+            yield x
+
+ntokens, embedding_vectors, labeled_train_loader, unlabeled_train_loader, valid_loader, test_loader, labeled_data_length, unlabeled_data_length = dataset.load(args.embedding, batch_size=args.batch_size)
+
+labeled_train_loader = iter(cycle(labeled_train_loader))
+unlabeled_train_loader = iter(cycle(unlabeled_train_loader))
+valid_loader = iter(cycle(valid_loader))
+test_loader = iter(cycle(test_loader))
 
 discriminator = discriminator.RNNModel(args.model, ntokens, args.emsize, args.nhid,
                        args.nlayers, args.nclass, embedding_vectors, args.dropout_em, 
