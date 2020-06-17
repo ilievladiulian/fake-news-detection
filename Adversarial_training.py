@@ -119,11 +119,11 @@ judger = judge.RNNModel(args.model, ntokens, args.emsize, args.nhid,
                        args.dropout_rnn, args.dropout_cl, args.tied).cuda(env_settings.CUDA_DEVICE)
 
 criterion = nn.CrossEntropyLoss(reduction='none')
-criterion_judge = nn.CrossEntropyLoss(reduction='none')
-dis_optimizer = torch.optim.Adam(discriminator.parameters(), lr=dis_learning_rate, weight_decay=0.005)
+criterion_judge = nn.BCELoss()
+dis_optimizer = torch.optim.Adam(discriminator.parameters(), lr=dis_learning_rate, weight_decay=0.0005)
 dis_scheduler = torch.optim.lr_scheduler.StepLR(dis_optimizer, step_size=10, gamma=args.reduce_rate)
 
-judge_optimizer = torch.optim.Adam(judger.parameters(), lr=judge_learning_rate, weight_decay=0.005)
+judge_optimizer = torch.optim.Adam(judger.parameters(), lr=judge_learning_rate, weight_decay=0.0005)
 judge_scheduler = torch.optim.lr_scheduler.StepLR(judge_optimizer, step_size=5, gamma=args.reduce_rate)
 
 ###############################################################################
@@ -437,23 +437,29 @@ try:
 
         patience -= 1
         # Save the model if the validation loss is the best we've seen so far.
-        if current_accuracy > best_accuracy:
+        if current_accuracy > best_accuracy and abs(current_accuracy - best_accuracy) > 0.001:
             best_accuracy = current_accuracy
             with open(os.path.join(args.save, 'discriminator.pt'), 'wb') as f:
                 torch.save(discriminator, f)
+            with open(os.path.join(args.save, 'discriminator-optimizer.pt'), 'wb') as f:
+                torch.save(dis_optimizer, f)
             with open(os.path.join(args.save, 'judger.pt'), 'wb') as f:
                 torch.save(judger, f)
+            with open(os.path.join(args.save, 'judger-optimizer.pt'), 'wb') as f:
+                torch.save(judge_optimizer, f)
             patience = patience_threshold
         
         if patience == 0:
             if phase == 'discriminator_only':
                 discriminator = torch.load(os.path.join(args.save, 'discriminator.pt'))
+                dis_optimizer = torch.load(os.path.join(args.save, 'discriminator-optimizer.pt'))
                 phase = 'judge_only'
-                patience_threshold = patience_threshold
+                patience = patience_threshold
             elif phase == 'judge_only':
                 judge = torch.load(os.path.join(args.save, 'judger.pt'))
+                judge_optimizer = torch.load(os.path.join(args.save, 'judger-optimizer.pt'))
                 phase = 'adversarial_training'
-                patience_threshold = patience_threshold
+                patience = patience_threshold
             else:
                 break
 

@@ -63,8 +63,8 @@ def load(embedding, batch_size=4):
     print ("Label Length: " + str(len(LABEL.vocab)))
 
     train_data, test_data = dataset.split(stratified=True, split_ratio=0.8)
-    train_data, valid_data = dataset.split(stratified=True, split_ratio=0.8)
-    labeled_data, unlabeled_data = train_data.split(stratified=True, split_ratio=0.5) # Further splitting of training_data to create new training_data & validation_data
+    train_data, valid_data = train_data.split(stratified=True, split_ratio=0.8)
+    labeled_data, unlabeled_data = train_data.split(stratified=True, split_ratio=0.7) # Further splitting of training_data to create new training_data & validation_data
     labeled_data_iter, unlabeled_data_iter, valid_iter, test_iter = data.BucketIterator.splits((labeled_data, unlabeled_data, valid_data, test_data), batch_size=batch_size, sort_key=lambda x: len(x.content), repeat=False, shuffle=True)
 
     vocab_size = len(TEXT.vocab)

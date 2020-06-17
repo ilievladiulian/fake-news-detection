@@ -38,12 +38,13 @@ class LongShortTermMemoryAttention():
             patience -= 1
             if val_loss < min_valid_loss and abs(min_valid_loss - val_loss) > 0.005:
                 patience = patience_threshold
-                torch.save(self.model.state_dict(), "./saved_models/lstm-attn-" + self.embedding)
+                torch.save(self.model, "./saved_models/lstm-attn-" + self.embedding)
                 min_valid_loss = val_loss
 
             if patience == 0:
                 break
 
     def test(self):
+        self.model = torch.load("./saved_models/lstm-attn-" + self.embedding)
         test_loss, test_acc = self.training_handler.eval_model(self.model, self.test_iter)
         return test_loss, test_acc
