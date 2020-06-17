@@ -11,5 +11,9 @@ class LogisticRegressionModel(nn.Module):
 
     def forward(self, x):
         input = self.word_embeddings(x)
+        input = input.permute(0, 2, 1) # y.size() = (batch_size, hidden_size, num_sequences)
+        input = F.max_pool1d(input, input.size()[2]) # y.size() = (batch_size, hidden_size, 1)
+        input = input.squeeze(2)
+        # input = input.permute(1, 0, 2)
         out = F.sigmoid(self.linear(input))
         return out

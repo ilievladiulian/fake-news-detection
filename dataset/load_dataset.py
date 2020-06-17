@@ -12,7 +12,7 @@ def extract_words(sentence):
     cleaned_text = [w.lower() for w in words if w not in ignore]
     return cleaned_text
 
-def load(embedding):
+def load(embedding='glove_specific', batch_size=4):
     TEXT = data.Field(sequential=True, tokenize=extract_words, lower=True, include_lengths=True, batch_first=True)
     LABEL = data.LabelField(dtype=torch.float)
 
@@ -50,7 +50,7 @@ def load(embedding):
     print ("Label Length: " + str(len(LABEL.vocab)))
 
     train_data, valid_data = train_data.split(stratified=True, split_ratio=0.8) # Further splitting of training_data to create new training_data & validation_data
-    train_iter, valid_iter, test_iter = data.BucketIterator.splits((train_data, valid_data, test_data), batch_size=4, sort_key=lambda x: len(x.content), repeat=False, shuffle=True)
+    train_iter, valid_iter, test_iter = data.BucketIterator.splits((train_data, valid_data, test_data), batch_size=batch_size, sort_key=lambda x: len(x.content), repeat=False, shuffle=True)
 
     vocab_size = len(TEXT.vocab)
 

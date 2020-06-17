@@ -9,8 +9,8 @@ from model.logistic_regression_model import LogisticRegressionModel
 import numpy as np
 
 class LogisticRegression():
-    def __init__(self, embedding):
-        TEXT, vocab_size, word_embeddings, self.train_iter, self.valid_iter, self.test_iter = load_dataset.load(embedding=embedding)
+    def __init__(self, embedding, batch_size):
+        TEXT, vocab_size, word_embeddings, self.train_iter, self.valid_iter, self.test_iter = load_dataset.load(embedding=embedding, batch_size=batch_size)
         self.embedding = embedding
 
         output_size = 10

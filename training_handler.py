@@ -4,9 +4,10 @@ from metrics import metrics_handler
 import env_settings
 
 class TrainingHandler():
-    def __init__(self, optimizer, loss_fn):
+    def __init__(self, optimizer, loss_fn, batch_size):
         self.optimizer = optimizer
         self.loss_fn = loss_fn
+        self.batch_size = batch_size
 
     def clip_gradient(self, model, clip_value):
         params = list(filter(lambda p: p.grad is not None, model.parameters()))
@@ -27,7 +28,7 @@ class TrainingHandler():
             if torch.cuda.is_available():
                 text = text.cuda(env_settings.CUDA_DEVICE)
                 target = target.cuda(env_settings.CUDA_DEVICE)
-            if (text.size()[0] is not 4):
+            if (text.size()[0] is not self.batch_size):
                 continue
             self.optimizer.zero_grad()
             prediction = model(text)
@@ -56,7 +57,7 @@ class TrainingHandler():
         with torch.no_grad():
             for idx, batch in enumerate(val_iter):
                 text = batch.content[0]
-                if (text.size()[0] is not 4):
+                if (text.size()[0] is not self.batch_size):
                     continue
                 target = batch.label
                 target = torch.autograd.Variable(target).long()

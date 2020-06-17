@@ -19,6 +19,7 @@ def init(filename):
     metrics_handler.metricsHandler = metrics_handler.MetricsHandler()
 
 def main(argv):
+    batchSize = 4
     modelName = ''
     modelPossibilities = {
         'logreg': LogisticRegression,
@@ -50,7 +51,7 @@ def main(argv):
     }
 
     try:
-        opts, args = getopt.getopt(argv, 'hmote:', ['help', 'model=', 'output=', 'type=', 'embedding=', 'gpu='])
+        opts, args = getopt.getopt(argv, 'hmote:', ['help', 'model=', 'output=', 'type=', 'embedding=', 'gpu=', 'batch_size='])
     except getopt.GetoptError:
         print('usage: main.py -m <modelname> or main.py --model=<modelname>, where <modelname>: rnn, lstm, cnn, rcnn or logreg')
         sys.exit(2)
@@ -68,6 +69,8 @@ def main(argv):
             embedding = arg
         elif opt in ('-g', '--gpu'):
             env_settings.CUDA_DEVICE = 'cuda:' + arg
+        elif opt in ('-bs', '--batch_size'):
+            batchSize = arg
     
     modelHandlerName = modelPossibilities.get(modelName, 'Invalid model')
     if modelHandlerName == 'Invalid model':

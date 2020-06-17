@@ -8,8 +8,8 @@ from training_handler import TrainingHandler
 import numpy as np
 
 class LongShortTermMemoryAttention():
-    def __init__(self, embedding):
-        TEXT, vocab_size, word_embeddings, self.train_iter, self.valid_iter, self.test_iter = load_dataset.load(embedding=embedding)
+    def __init__(self, embedding, batch_size):
+        TEXT, vocab_size, word_embeddings, self.train_iter, self.valid_iter, self.test_iter = load_dataset.load(embedding=embedding, batch_size=batch_size)
         self.embedding = embedding
 
         batch_size = 4
