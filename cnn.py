@@ -12,7 +12,6 @@ class ConvolutionalNN():
         TEXT, vocab_size, word_embeddings, self.train_iter, self.valid_iter, self.test_iter = load_dataset.load(embedding=embedding, batch_size=batch_size)
         self.embedding = embedding
 
-        batch_size = 4
         output_size = 10
         in_channel = 1
         out_channel = 16
@@ -26,7 +25,7 @@ class ConvolutionalNN():
 
         optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, self.model.parameters()), weight_decay=0.0005, lr=0.0001)
         loss_fn = F.cross_entropy
-        self.training_handler = TrainingHandler(optimizer, loss_fn)
+        self.training_handler = TrainingHandler(optimizer, loss_fn, batch_size)
 
     def train(self, numberOfEpochs):
         patience_threshold = 3

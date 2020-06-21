@@ -20,7 +20,7 @@ class LogisticRegression():
 
         optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, self.model.parameters()), weight_decay=0.0005, lr=0.0001)
         loss_fn = F.cross_entropy
-        self.training_handler = TrainingHandler(optimizer, loss_fn)
+        self.training_handler = TrainingHandler(optimizer, loss_fn, batch_size)
 
     def train(self, numberOfEpochs):
         patience_threshold = 3

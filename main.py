@@ -70,7 +70,7 @@ def main(argv):
         elif opt in ('-g', '--gpu'):
             env_settings.CUDA_DEVICE = 'cuda:' + arg
         elif opt in ('-bs', '--batch_size'):
-            batchSize = arg
+            batchSize = int(arg)
     
     modelHandlerName = modelPossibilities.get(modelName, 'Invalid model')
     if modelHandlerName == 'Invalid model':
@@ -109,7 +109,7 @@ def main(argv):
             output_handler.outputFileHandler.write(f'Test recall: {metrics_handler.metricsHandler.getRecall():.3f}%\n')
             output_handler.outputFileHandler.write(f'Test precision: {metrics_handler.metricsHandler.getPrecision():.3f}%\n')
     else:
-        modelHandler = modelHandlerName(embeddingPossibilities[embedding])
+        modelHandler = modelHandlerName(embeddingPossibilities[embedding], batchSize)
         modelHandler.train(numberOfEpochs)
         metrics_handler.metricsHandler.reset()
         test_loss, test_acc = modelHandler.test()
