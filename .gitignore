@@ -25,3 +25,7 @@ saved_models/
 gan/ag_news_csv/
 
 ag_news_csv/
+
+.idea/
+
+**/*.iml

@@ -16,12 +16,12 @@ class ConvolutionalNN():
         in_channel = 1
         out_channel = 16
         kernel_heights = [3, 5, 7]
-        keep_probab = 1
+        keep_probab = 0
         stride = 1
-        padding = 0
+        padding = [1, 2, 3]
         embedding_length = 300
 
-        self.model = CNN(batch_size, output_size, in_channel, out_channel, kernel_heights, keep_probab, stride, padding, vocab_size, embedding_length, word_embeddings)
+        self.model = CNN(batch_size, output_size, in_channel, out_channel, kernel_heights, stride, padding, keep_probab, vocab_size, embedding_length, word_embeddings)
 
         optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, self.model.parameters()), weight_decay=0.0005, lr=0.0001)
         loss_fn = F.cross_entropy
