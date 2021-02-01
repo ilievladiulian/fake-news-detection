@@ -25,9 +25,8 @@ python ./dataset/save_dataset.py
 For testing the software, we also provide our full dataset in /data folder as an arhive. Please use monogimport to import it o MongoDB.
 
 ```
-mongoimport 
+mongoimport --db=fake_news --collection=fake_news_corpus --type=json --file=dataset_clean.json
 ```
-
 
 ### Usage
 
