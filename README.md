@@ -1,4 +1,4 @@
-# FakeNewsClassifier
+# Context-Aware Misinformation Detection using Deep Learning Architectures
 
 ### Setting up
 
