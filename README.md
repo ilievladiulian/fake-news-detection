@@ -2,7 +2,9 @@
 
 ### Setting up
 
-This project uses the following dependencies:    
+Install MongoDB Community Server v4.4.3 and start it using the default host and port.
+
+This project uses the following Python v3.7+ dependencies:    
 
 - pytorch 0.4.1   
 - torchtext 0.3.1     
@@ -18,6 +20,12 @@ To save the dataset to mongo run:
 
 ```
 python ./dataset/save_dataset.py
+```
+
+For testing the software, we also provide our full dataset in /data folder as an arhive. Please use monogimport to import it o MongoDB.
+
+```
+mongoimport 
 ```
 
 
