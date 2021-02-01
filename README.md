@@ -1,6 +1,6 @@
 # Context-Aware Misinformation Detection using Deep Learning Architectures
 
-### Setting up
+### Setup
 
 Install MongoDB Community Server v4.4.3 and start it using the default host and port.
 
